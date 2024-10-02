@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import { memo } from "react";
 import { BellOutlined } from '@ant-design/icons';
 import { Badge, Spin, Tabs } from 'antd';
 import classNames from 'classnames';
@@ -7,9 +9,9 @@ import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import type { NoticeIconTabProps } from './NoticeList';
 import NoticeList from './NoticeList';
-
-const { TabPane } = Tabs;
-
+const {
+  TabPane
+} = Tabs;
 export type NoticeIconProps = {
   count?: number;
   bell?: React.ReactNode;
@@ -28,11 +30,10 @@ export type NoticeIconProps = {
   emptyImage?: string;
   children?: React.ReactElement<NoticeIconTabProps>[];
 };
-
 const NoticeIcon: React.FC<NoticeIconProps> & {
   Tab: typeof NoticeList;
-} = (props) => {
-  const getNotificationBox = (): React.ReactNode => {
+} = memo(props => {
+  const getNotificationBox = memo((): React.ReactNode => {
     const {
       children,
       loading,
@@ -41,7 +42,7 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
       onItemClick,
       onViewMore,
       clearText,
-      viewMoreText,
+      viewMoreText
     } = props;
     if (!children) {
       return null;
@@ -51,76 +52,59 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
       if (!child) {
         return;
       }
-      const { list, title, count, tabKey, showClear, showViewMore } = child.props;
+      const {
+        list,
+        title,
+        count,
+        tabKey,
+        showClear,
+        showViewMore
+      } = child.props;
       const len = list && list.length ? list.length : 0;
       const msgCount = count || count === 0 ? count : len;
       const tabTitle: string = msgCount > 0 ? `${title} (${msgCount})` : title;
-      panes.push(
-        <TabPane tab={tabTitle} key={tabKey}>
-          <NoticeList
-            clearText={clearText}
-            viewMoreText={viewMoreText}
-            list={list}
-            tabKey={tabKey}
-            onClear={(): void => onClear && onClear(title, tabKey)}
-            onClick={(item): void => onItemClick && onItemClick(item, child.props)}
-            onViewMore={(event): void => onViewMore && onViewMore(child.props, event)}
-            showClear={showClear}
-            showViewMore={showViewMore}
-            title={title}
-          />
-        </TabPane>,
-      );
+      panes.push(<TabPane tab={tabTitle} key={tabKey}>
+          <NoticeList clearText={clearText} viewMoreText={viewMoreText} list={list} tabKey={tabKey} onClear={useCallback((): void => onClear && onClear(title, tabKey), [])} onClick={useCallback((item): void => onItemClick && onItemClick(item, child.props), [])} onViewMore={useCallback((event): void => onViewMore && onViewMore(child.props, event), [])} showClear={showClear} showViewMore={showViewMore} title={title} />
+        </TabPane>);
     });
-    return (
-      <>
+    return <>
         <Spin spinning={loading} delay={300}>
           <Tabs className={styles.tabs} onChange={onTabChange}>
             {panes}
           </Tabs>
         </Spin>
-      </>
-    );
-  };
-
-  const { className, count, bell } = props;
-
+      </>;
+  });
+  const {
+    className,
+    count,
+    bell
+  } = props;
   const [visible, setVisible] = useMergedState<boolean>(false, {
     value: props.popupVisible,
-    onChange: props.onPopupVisibleChange,
+    onChange: props.onPopupVisibleChange
   });
   const noticeButtonClass = classNames(className, styles.noticeButton);
   const notificationBox = getNotificationBox();
   const NoticeBellIcon = bell || <BellOutlined className={styles.icon} />;
-  const trigger = (
-    <span className={classNames(noticeButtonClass, { opened: visible })}>
-      <Badge count={count} style={{ boxShadow: 'none' }} className={styles.badge}>
+  const trigger = <span className={classNames(noticeButtonClass, {
+    opened: visible
+  })}>
+      <Badge count={count} style={{
+      boxShadow: 'none'
+    }} className={styles.badge}>
         {NoticeBellIcon}
       </Badge>
-    </span>
-  );
+    </span>;
   if (!notificationBox) {
     return trigger;
   }
-
-  return (
-    <HeaderDropdown
-      placement="bottomRight"
-      overlay={notificationBox}
-      overlayClassName={styles.popover}
-      trigger={['click']}
-      visible={visible}
-      onVisibleChange={setVisible}
-    >
+  return <HeaderDropdown placement="bottomRight" overlay={notificationBox} overlayClassName={styles.popover} trigger={['click']} visible={visible} onVisibleChange={setVisible}>
       {trigger}
-    </HeaderDropdown>
-  );
-};
-
+    </HeaderDropdown>;
+});
 NoticeIcon.defaultProps = {
-  emptyImage: 'https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg',
+  emptyImage: 'https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg'
 };
-
 NoticeIcon.Tab = NoticeList;
-
 export default NoticeIcon;

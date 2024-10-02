@@ -1,8 +1,8 @@
+import { memo } from "react";
 import { Avatar, List } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
 import styles from './NoticeList.less';
-
 export type NoticeIconTabProps = {
   count?: number;
   showClear?: boolean;
@@ -18,7 +18,7 @@ export type NoticeIconTabProps = {
   list: API.NoticeIconItem[];
   onViewMore?: (e: any) => void;
 };
-const NoticeList: React.FC<NoticeIconTabProps> = ({
+const NoticeList: React.FC<NoticeIconTabProps> = memo(({
   list = [],
   onClick,
   onClear,
@@ -28,85 +28,47 @@ const NoticeList: React.FC<NoticeIconTabProps> = ({
   showClear = true,
   clearText,
   viewMoreText,
-  showViewMore = false,
+  showViewMore = false
 }) => {
   if (!list || list.length === 0) {
-    return (
-      <div className={styles.notFound}>
-        <img
-          src="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
-          alt="not found"
-        />
+    return <div className={styles.notFound}>
+        <img src="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg" alt="not found" />
         <div>{emptyText}</div>
-      </div>
-    );
+      </div>;
   }
-  return (
-    <div>
-      <List<API.NoticeIconItem>
-        className={styles.list}
-        dataSource={list}
-        renderItem={(item, i) => {
-          const itemCls = classNames(styles.item, {
-            [styles.read]: item.read,
-          });
-          // eslint-disable-next-line no-nested-ternary
-          const leftIcon = item.avatar ? (
-            typeof item.avatar === 'string' ? (
-              <Avatar className={styles.avatar} src={item.avatar} />
-            ) : (
-              <span className={styles.iconElement}>{item.avatar}</span>
-            )
-          ) : null;
-
-          return (
-            <div
-              onClick={() => {
-                onClick?.(item);
-              }}
-            >
+  return <div>
+      <List<API.NoticeIconItem> className={styles.list} dataSource={list} renderItem={(item, i) => {
+      const itemCls = classNames(styles.item, {
+        [styles.read]: item.read
+      });
+      // eslint-disable-next-line no-nested-ternary
+      const leftIcon = item.avatar ? typeof item.avatar === 'string' ? <Avatar className={styles.avatar} src={item.avatar} /> : <span className={styles.iconElement}>{item.avatar}</span> : null;
+      return <div onClick={() => {
+        onClick?.(item);
+      }}>
               <List.Item className={itemCls} key={item.key || i}>
-                <List.Item.Meta
-                  className={styles.meta}
-                  avatar={leftIcon}
-                  title={
-                    <div className={styles.title}>
+                <List.Item.Meta className={styles.meta} avatar={leftIcon} title={<div className={styles.title}>
                       {item.title}
                       <div className={styles.extra}>{item.extra}</div>
-                    </div>
-                  }
-                  description={
-                    <div>
+                    </div>} description={<div>
                       <div className={styles.description}>{item.description}</div>
                       <div className={styles.datetime}>{item.datetime}</div>
-                    </div>
-                  }
-                />
+                    </div>} />
               </List.Item>
-            </div>
-          );
-        }}
-      />
+            </div>;
+    }} />
       <div className={styles.bottomBar}>
-        {showClear ? (
-          <div onClick={onClear}>
+        {showClear ? <div onClick={onClear}>
             {clearText} {title}
-          </div>
-        ) : null}
-        {showViewMore ? (
-          <div
-            onClick={(e) => {
-              if (onViewMore) {
-                onViewMore(e);
-              }
-            }}
-          >
+          </div> : null}
+        {showViewMore ? <div onClick={e => {
+        if (onViewMore) {
+          onViewMore(e);
+        }
+      }}>
             {viewMoreText}
-          </div>
-        ) : null}
+          </div> : null}
       </div>
-    </div>
-  );
-};
-
+    </div>;
+});
 export default NoticeList;
