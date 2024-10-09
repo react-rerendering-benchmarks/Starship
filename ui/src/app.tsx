@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
 import { LinkOutlined } from '@ant-design/icons';
@@ -8,7 +9,6 @@ import { getLocale } from 'umi';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -24,7 +24,7 @@ export async function getInitialState(): Promise<{
   const fetchUserInfo = async () => {
     try {
       const msg = await queryCurrentUser({
-        skipErrorHandler: true,
+        skipErrorHandler: true
       });
       return msg.data;
     } catch (error) {
@@ -38,25 +38,29 @@ export async function getInitialState(): Promise<{
     return {
       fetchUserInfo,
       currentUser,
-      settings: defaultSettings,
+      settings: defaultSettings
     };
   }
   return {
     fetchUserInfo,
-    settings: defaultSettings,
+    settings: defaultSettings
   };
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout: RunTimeLayoutConfig = ({
+  initialState
+}) => {
   return {
-    rightContentRender: () => <RightContent />,
+    rightContentRender: memo(() => <RightContent />),
     // waterMarkProps: {
     //   content: initialState?.currentUser?.name,
     // },
-    footerRender: () => <Footer />,
+    footerRender: memo(() => <Footer />),
     onPageChange: () => {
-      const { location } = history;
+      const {
+        location
+      } = history;
       // 如果没有登录，重定向到 login
       if (!initialState?.currentUser && location.pathname !== loginPath) {
         history.push(loginPath);
@@ -69,56 +73,47 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         const language = getLocale();
         let result = defaultMenuData;
         if (language === 'en-US') {
-          result = defaultMenuData.map((item) => {
+          result = defaultMenuData.map(item => {
             return {
               ...item,
               name: item.name_en || item.name,
               element: undefined,
               id: undefined,
               parentId: undefined,
-              unaccessible: undefined,
+              unaccessible: undefined
             };
           });
         }
         return result;
-      },
+      }
     },
-    layoutBgImgList: [
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/D2LWSqNny4sAAAAAAAAAAAAAFl94AQBr',
-        left: 85,
-        bottom: 100,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/C2TWRpJpiC0AAAAAAAAAAAAAFl94AQBr',
-        bottom: -68,
-        right: -45,
-        height: '303px',
-      },
-      {
-        src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/F6vSTbj8KpYAAAAAAAAAAAAAFl94AQBr',
-        bottom: 0,
-        left: 0,
-        width: '331px',
-      },
-    ],
-    links: isDev
-      ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+    layoutBgImgList: [{
+      src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/D2LWSqNny4sAAAAAAAAAAAAAFl94AQBr',
+      left: 85,
+      bottom: 100,
+      height: '303px'
+    }, {
+      src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/C2TWRpJpiC0AAAAAAAAAAAAAFl94AQBr',
+      bottom: -68,
+      right: -45,
+      height: '303px'
+    }, {
+      src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/F6vSTbj8KpYAAAAAAAAAAAAAFl94AQBr',
+      bottom: 0,
+      left: 0,
+      width: '331px'
+    }],
+    links: isDev ? [<Link key="openapi" to="/umi/plugin/openapi" target="_blank">
             <LinkOutlined />
             <span>OpenAPI 文档</span>
-          </Link>,
-        ]
-      : [],
+          </Link>] : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态
-    childrenRender: (children) => {
+    childrenRender: children => {
       // if (initialState?.loading) return <PageLoading />;
-      return (
-        <>
+      return <>
           {children}
           {/* {!props.location?.pathname?.includes('/login') && (
             <SettingDrawer
@@ -132,11 +127,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
                 }));
               }}
             />
-          )} */}
-        </>
-      );
+           )} */}
+        </>;
     },
-    ...initialState?.settings,
+    ...initialState?.settings
   };
 };
 
@@ -146,5 +140,5 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request = {
-  ...errorConfig,
+  ...errorConfig
 };
